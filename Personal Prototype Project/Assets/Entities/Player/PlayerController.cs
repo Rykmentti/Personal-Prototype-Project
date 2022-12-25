@@ -6,10 +6,12 @@ public class PlayerController : MonoBehaviour
 {
     public static PlayerController player;
     public static Transform playerTransform;
+    
     public static float playerHealth;
     public static bool rollActive;
-    public Animator animator;
 
+    public Animator animator;
+    public AudioSource audioSource;
     public Camera playerCamera;
 
     public GameObject playerMiekkaPrefab;
@@ -32,11 +34,20 @@ public class PlayerController : MonoBehaviour
     public bool blockCooldown;
     public bool rollCooldown;
 
+    public bool isMoving;
+    public bool isDead;
+    public bool deathMethodHasRun;
+
     public bool isAttackingUp;
     public bool isAttackingDown;
     public bool isAttackingLeft;
     public bool isAttackingRight;
-    public bool isDead;
+
+    public bool playerIsShooting;
+    public bool isShootingUp;
+    public bool isShootingDown;
+    public bool isShootingLeft;
+    public bool isShootingRight;
 
     public static bool playerArrivingFromNorth;
     public static bool playerArrivingFromEast;
@@ -45,6 +56,7 @@ public class PlayerController : MonoBehaviour
 
     //Debug/Boss taito testaus
 
+    float rotation;
 
 
     void Awake()
@@ -72,6 +84,8 @@ public class PlayerController : MonoBehaviour
         playerHealth = 100;
         playerTransform = transform;
         animator = GetComponent<Animator>();
+        audioSource = GetComponent<AudioSource>();
+        audioSource.clip = Resources.Load("Sounds/PlayerFootsteps") as AudioClip;
 
     }
 
@@ -92,40 +106,40 @@ public class PlayerController : MonoBehaviour
          * GetKey = Toistaa sisällä olevaa koodia, niin kauan aikaa ku pidät nappia pohjassa
          * GetKeyUp = toistaa koodin kerran, kun lasket napista irti ja nappi tulee ylös.
         */
+        if(animator.GetBool("IsMovingUp") == true || animator.GetBool("IsMovingDown") == true || animator.GetBool("IsMovingLeft") == true || animator.GetBool("IsMovingRight") == true)
+        {
+            isMoving = true;
+        }
+
+        else
+        {
+            isMoving = false;
+        }
 
         if (playerHealth <= 0)
         {
             isDead = true;
         }
 
-        if (isDead == false)
+        if (playerIsShooting == false)
         {
-            playerControls();
-        }
-
-        if (isDead == true)
-        {
-            float deathAnimationRunLength = 1.1f;
-
-            IEnumerator AnimationRuntime()
+            if(isDead == false)
             {
-                ResetAnimatorBooleanValues();
-                animator.SetBool("IsDead", true);
-                yield return new WaitForSeconds(deathAnimationRunLength);
-                yield return new WaitForSeconds(1);
-                //Destroy(gameObject);
+                PlayerControls();
             }
-
-            StartCoroutine(AnimationRuntime());
         }
 
-        
+        if (isDead == true && deathMethodHasRun == false)
+        {
+            deathMethodHasRun = true;
+            PlayerDeath();
+        } 
     }
     // Strike Mekaniikka
     void PlayerStrike()
     {
 
-        if (playerStrikeCooldown == false)
+        if (playerStrikeCooldown == false && playerIsShooting == false)
         {
             IEnumerator PlayerStrikeCooldown()
             {
@@ -185,15 +199,18 @@ public class PlayerController : MonoBehaviour
     }
     void PlayerShoot()
     {
-
-        if(playerShootCooldown == false)
+        //Cannot shoot and move at same time, otherwise two animations at the same time.
+        if(playerShootCooldown == false && isMoving == false)
         {
+            playerIsShooting = true;
+            ResetAnimatorBooleanValues();
             IEnumerator PlayerShootCooldown()
             {
                 playerShootCooldown = true;
-                yield return new WaitForSeconds(1);
+                yield return new WaitForSeconds(0.6f);
                 playerShootCooldown = false;
             }
+
             Vector3 mousePos = Input.mousePosition;
             mouseScreenPosition = playerCamera.ScreenToWorldPoint(new Vector3(mousePos.x, mousePos.y, playerCamera.nearClipPlane));
 
@@ -208,11 +225,70 @@ public class PlayerController : MonoBehaviour
             //Miksi vitussa tässä pitää rotationiin laittaa +90, että toi kaava toimii, ku PlayerMiekassa sitä ei tarvi laittaa. EnemyArrow ihan sama juttu, ku PlayerArrow, mutta siinä sen sit taas pitää olla -90.  wtf? :D
             Vector3 projectileStartRotation = new Vector3(0f, 0f, rotation + 90);
             Quaternion quaternion = Quaternion.Euler(projectileStartRotation);
-
-            Instantiate(playerArrowPrefab, transform.position, quaternion);
+            float shootRotation = projectileStartRotation.z;
+            shootRotation = rotation + 180;
+            Debug.Log(shootRotation);
+            float attackAnimationRunLength = 0.6f;
+            //East
+            if (shootRotation >= 315 && shootRotation <= 360 || shootRotation >= 0 && shootRotation <= 45)
+            {
+                IEnumerator AnimationRunTime()
+                {
+                    animator.SetBool("IsShootingRight", true);
+                    yield return new WaitForSeconds(attackAnimationRunLength);
+                    animator.SetBool("IsShootingRight", false);
+                    animator.SetBool("IsNotMovingRight", true);
+                    playerIsShooting = false;
+                }
+                StartCoroutine(AnimationRunTime());
+            }
+            //North
+            else if (shootRotation >= 45 && shootRotation <= 135)
+            {
+                IEnumerator AnimationRunTime()
+                {
+                    animator.SetBool("IsShootingUp", true);
+                    yield return new WaitForSeconds(attackAnimationRunLength);
+                    animator.SetBool("IsShootingUp", false);
+                    animator.SetBool("IsNotMovingUp", true);
+                    playerIsShooting = false;
+                }
+                StartCoroutine(AnimationRunTime());
+            }
+            //South
+            else if (shootRotation >= 225 && shootRotation <= 315)
+            {
+                IEnumerator AnimationRunTime()
+                {
+                    animator.SetBool("IsShootingDown", true);
+                    yield return new WaitForSeconds(attackAnimationRunLength);
+                    animator.SetBool("IsShootingDown", false);
+                    animator.SetBool("IsNotMovingDown", true);
+                    playerIsShooting = false;
+                }
+                StartCoroutine(AnimationRunTime());
+            }
+            //West
+            else if ((shootRotation >= 135 && shootRotation <= 225))
+            {
+                IEnumerator AnimationRunTime()
+                {
+                    animator.SetBool("IsShootingLeft", true);
+                    yield return new WaitForSeconds(attackAnimationRunLength);
+                    animator.SetBool("IsShootingLeft", false);
+                    animator.SetBool("IsNotMovingLeft", true);
+                    playerIsShooting = false;
+                }
+                StartCoroutine(AnimationRunTime());
+            }
+            IEnumerator DelayedShoot()
+            {
+                yield return new WaitForSeconds(0.4f);
+                Instantiate(playerArrowPrefab, transform.position, quaternion);
+            }
+            StartCoroutine(DelayedShoot());
             StartCoroutine(PlayerShootCooldown());
         }
-        
     }
     // Block Mekaniikka
     void Block()
@@ -271,9 +347,24 @@ public class PlayerController : MonoBehaviour
         animator.SetBool("IsNotMovingDown", false);
         animator.SetBool("IsNotMovingRight", false);
         animator.SetBool("IsNotMovingLeft", false);
+        animator.SetBool("IsShootingUp", false);
+        animator.SetBool("IsShootingDown", false);
+        animator.SetBool("IsShootingRight", false);
+        animator.SetBool("IsShootingLeft", false);
     }
 
-    void playerControls()
+    void PlayerDeath()
+    {
+        audioSource.clip = Resources.Load("Sounds/PlayerDeathSound") as AudioClip;
+        audioSource.loop = false;
+        audioSource.Play();
+
+        ResetAnimatorBooleanValues();
+        StopAllCoroutines();
+        animator.SetBool("IsDead", true);
+    }
+
+    void PlayerControls()
     {
         if (Input.GetKeyDown(KeyCode.Space))
         {
@@ -307,6 +398,18 @@ public class PlayerController : MonoBehaviour
             threshold = -0.38f;
         }
         */
+        if (isMoving == true)
+        {
+            if (audioSource.isPlaying == false)
+            {
+                audioSource.Play();
+            }
+        }
+        if (isMoving == false && audioSource.isPlaying == true)
+        {
+            audioSource.Stop();
+        }
+        
         if (Input.GetKey(KeyCode.UpArrow) || Input.GetKey(KeyCode.W) && rollActive == false)
         {
             isAttackingUp = true;

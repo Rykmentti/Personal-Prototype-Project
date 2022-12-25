@@ -14,11 +14,12 @@ public class EnemyControllerMelee : EnemyManager
     public float targetDistance;
 
     public bool enemyStrikeCooldown;
+    bool isDead;
     // Start is called before the first frame update
-    void OnGUI()
-    {
-        GUI.Label(new Rect(10, 30, 200, 30), "Enemy Health: " + enemyHealth);
-    }
+    //void OnGUI()
+    //{
+    //    GUI.Label(new Rect(10, 30, 200, 30), "Enemy Health: " + enemyHealth);
+    //}
     void Start()
     {
         enemyHealth = 100;
@@ -29,20 +30,32 @@ public class EnemyControllerMelee : EnemyManager
     // Update is called once per frame
     void Update()
     {
-        targetDistance = DistanceCalculation();
         if (enemyHealth < 1)
         {
-            Destroy(gameObject);
+            isDead = true;
         }
-        if (targetDistance >= 3.5 && targetDistance <= 30)
+        if (isDead == true)
         {
-            MoveTowardsPlayer();
+            StopAllCoroutines();
+
+            ResetAnimatorBooleanValues();
+            animator.SetBool("IsDead", true);
+            Invoke("SelfDestroy", 1f);
         }
-        if (targetDistance <= 3.5 && enemyStrikeCooldown == false)
+        else if (isDead == false)
         {
-            EnemyStrike();
-            StartCoroutine(EnemyStrikeCooldown());
+            targetDistance = DistanceCalculation();
+            if (targetDistance > 3.5 && targetDistance <= 30)
+            {
+                MoveTowardsPlayer();
+            }
+            if (targetDistance <= 3.5 && enemyStrikeCooldown == false)
+            {
+                EnemyStrike();
+                StartCoroutine(EnemyStrikeCooldown());
+            }
         }
+        
 
 
     }
@@ -53,6 +66,8 @@ public class EnemyControllerMelee : EnemyManager
      */
     void EnemyStrike()
     {
+        float attackAnimationRunLength = 0.5f;
+
         float selfPosX = transform.position.x;
         float selfPosY = transform.position.y;
         float playerPosX = PlayerController.playerTransform.position.x;
@@ -62,6 +77,7 @@ public class EnemyControllerMelee : EnemyManager
         Vector2 Point_2 = new Vector2(playerPosX,playerPosY);
         float angle = Mathf.Atan2(Point_2.y - Point_1.y, Point_2.x - Point_1.x) * Mathf.Rad2Deg;
 
+        ResetAnimatorBooleanValues();
         /*
         Debug.Log("Angle is = " + angle);
         */
@@ -73,7 +89,15 @@ public class EnemyControllerMelee : EnemyManager
             startRotation = new Vector3(0f, 0f, -45f);
             localPosition = new Vector2(1, 1);
             threshold = -0.92f;
-            animator.SetBool("IsAttackingRight", true);
+            IEnumerator AnimationRunTime()
+            {
+                animator.SetBool("IsNotMovingRight", false);
+                animator.SetBool("IsAttackingRight", true);
+                yield return new WaitForSeconds(attackAnimationRunLength);
+                animator.SetBool("IsAttackingRight", false);
+                animator.SetBool("IsNotMovingRight", true);
+            }
+            StartCoroutine(AnimationRunTime());
         }
         //North
         else if (angle >= 45 && angle <= 135)
@@ -81,7 +105,15 @@ public class EnemyControllerMelee : EnemyManager
             startRotation = new Vector3(0f, 0f, 45f);
             localPosition = new Vector2(-1, 1);
             threshold = -0.38f;
-            animator.SetBool("IsAttackingUp", true);
+            IEnumerator AnimationRunTime()
+            {
+                animator.SetBool("IsNotMovingUp", false);
+                animator.SetBool("IsAttackingUp", true);
+                yield return new WaitForSeconds(attackAnimationRunLength);
+                animator.SetBool("IsAttackingUp", false);
+                animator.SetBool("IsNotMovingUp", true);
+            }
+            StartCoroutine(AnimationRunTime());
         }
         //South
         else if (angle >= -135 && angle <= -45)
@@ -90,7 +122,15 @@ public class EnemyControllerMelee : EnemyManager
             startRotation = new Vector3(0f, 0f, 225f);
             localPosition = new Vector2(1, -1);
             threshold = 0.92f;
-            animator.SetBool("IsAttackingDown", true);
+            IEnumerator AnimationRunTime()
+            {
+                animator.SetBool("IsNotMovingDown", false);
+                animator.SetBool("IsAttackingDown", true);
+                yield return new WaitForSeconds(attackAnimationRunLength);
+                animator.SetBool("IsAttackingDown", false);
+                animator.SetBool("IsNotMovingDown", true);
+            }
+            StartCoroutine(AnimationRunTime());
         }
         //West
         /*
@@ -104,7 +144,15 @@ public class EnemyControllerMelee : EnemyManager
             startRotation = new Vector3(0f, 0f, 135f);
             localPosition = new Vector2(-1, -1);
             threshold = 0.38f;
-            animator.SetBool("IsAttackingLeft", true);
+            IEnumerator AnimationRunTime()
+            {
+                animator.SetBool("IsNotMovingLeft", false);
+                animator.SetBool("IsAttackingLeft", true);
+                yield return new WaitForSeconds(attackAnimationRunLength);
+                animator.SetBool("IsAttackingLeft", false);
+                animator.SetBool("IsNotMovingLeft", true);
+            }
+            StartCoroutine(AnimationRunTime());
         }
         Instantiate(enemyMiekkaPrefab, transform.position, enemyMiekkaPrefab.transform.rotation, transform.parent = transform);
     }
@@ -167,5 +215,13 @@ public class EnemyControllerMelee : EnemyManager
         animator.SetBool("IsMovingDown", false);
         animator.SetBool("IsMovingRight", false);
         animator.SetBool("IsMovingLeft", false);
+        animator.SetBool("IsNotMovingUp", false);
+        animator.SetBool("IsNotMovingDown", false);
+        animator.SetBool("IsNotMovingRight", false);
+        animator.SetBool("IsNotMovingLeft", false);
+    }
+    void SelfDestroy()
+    {
+        Destroy(gameObject);
     }
 }

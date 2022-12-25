@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 7800486867696469595}
   - component: {fileID: 7800486867696469594}
   - component: {fileID: 7800486867696469598}
+  - component: {fileID: 5289450605217045922}
   m_Layer: 0
   m_Name: BossEnemy
   m_TagString: Enemy
@@ -74,8 +75,8 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 98
-  m_Sprite: {fileID: -9095717837082945937, guid: bd3cb4af8406d4436a2ae8c2aafe1f8d, type: 3}
-  m_Color: {r: 0.735849, g: 0.3923235, b: 0.17702027, a: 1}
+  m_Sprite: {fileID: 5769489804987829422, guid: 04fea1949bb0f7947b297030ca29b428, type: 3}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -151,3 +152,22 @@ MonoBehaviour:
   bossPhase2CirclingSwordsOnlyExecuteOnce: 0
   bossPhase3: 0
   bossPhase3CirclingSwordsOnlyExecuteOnce: 0
+--- !u!95 &5289450605217045922
+Animator:
+  serializedVersion: 3
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7800486867696469593}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 74b08bbf875cac8408056441c8d42c42, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorControllerStateOnDisable: 0

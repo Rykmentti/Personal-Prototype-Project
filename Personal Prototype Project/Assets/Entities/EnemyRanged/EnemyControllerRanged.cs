@@ -11,11 +11,12 @@ public class EnemyControllerRanged : EnemyManager
     public float angle;
 
     public bool enemyShootCooldown;
+    bool isDead;
 
-    void OnGUI()
-    {
-        GUI.Label(new Rect(10, 50, 200, 30), "Ranged Enemy Health: " + enemyHealth);
-    }
+    //void OnGUI()
+    //{
+    //    GUI.Label(new Rect(10, 50, 200, 30), "Ranged Enemy Health: " + enemyHealth);
+    //}
     // Start is called before the first frame update
     void Start()
     {
@@ -32,20 +33,31 @@ public class EnemyControllerRanged : EnemyManager
             Debug.Log("TargetDistance is = " + targetDistance);
         }
 
-        targetDistance = DistanceCalculation();
         if (enemyHealth < 1)
         {
-            Destroy(gameObject);
+            isDead = true;
         }
-        if (targetDistance >= 15 && targetDistance <= 30)
+        if (isDead == true)
         {
-            MoveTowardsPlayer();
+            StopAllCoroutines();
+
+            ResetAnimatorBooleanValues();
+            animator.SetBool("IsDead", true);
+            Invoke("SelfDestroy", 1f);
         }
-        if (targetDistance <= 15 && enemyShootCooldown == false)
+        else if(isDead == false)
         {
-            EnemyShoot();
-            StartCoroutine(EnemyShootCooldown());
-        }
+            targetDistance = DistanceCalculation();
+            if (targetDistance >= 15 && targetDistance <= 30)
+            {
+                MoveTowardsPlayer();
+            }
+            if (targetDistance <= 15 && enemyShootCooldown == false)
+            {
+                EnemyShoot();
+                StartCoroutine(EnemyShootCooldown());
+            }
+        } 
     }
 
     void EnemyShoot()
@@ -118,7 +130,7 @@ public class EnemyControllerRanged : EnemyManager
             //Changing EulerAngles to Quaternions, so we can use them in Instantiate as parameter.
             Quaternion quaternion = Quaternion.Euler(projectileStartRotation);
 
-            Instantiate(enemyArrowPrefab, transform.position, quaternion);
+            Instantiate(enemyArrowPrefab, transform.position, quaternion); 
         }
     }
     void MoveTowardsPlayer()
@@ -166,6 +178,10 @@ public class EnemyControllerRanged : EnemyManager
         animator.SetBool("IsNotAttackingDown", false);
         animator.SetBool("IsNotAttackingRight", false);
         animator.SetBool("IsNotAttackingLeft", false);
+        animator.SetBool("IsAttackingUp", false);
+        animator.SetBool("IsAttackingDown", false);
+        animator.SetBool("IsAttackingRight", false);
+        animator.SetBool("IsAttackingLeft", false);
     }
     float DistanceCalculation()
     {
@@ -190,5 +206,9 @@ public class EnemyControllerRanged : EnemyManager
         enemyShootCooldown = true;
         yield return new WaitForSeconds(1.2f);
         enemyShootCooldown = false;
+    }
+    void SelfDestroy()
+    {
+        Destroy(gameObject);
     }
 }

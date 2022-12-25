@@ -75,12 +75,12 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 98
-  m_Sprite: {fileID: -3642579417998360986, guid: 9f3b243bb7b67754186415ad63d4caaa, type: 3}
+  m_Sprite: {fileID: -5853773339765324999, guid: 9f3b243bb7b67754186415ad63d4caaa, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 1, y: 2}
+  m_Size: {x: 1.52, y: 2.24}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -140,6 +140,7 @@ MonoBehaviour:
   enemyArrowPrefab: {fileID: 5704716162604351744, guid: 96ed3924955ed234488cf47953fc7d8e, type: 3}
   animator: {fileID: 0}
   targetDistance: 0
+  angle: 0
   enemyShootCooldown: 0
 --- !u!95 &985186922
 Animator:
