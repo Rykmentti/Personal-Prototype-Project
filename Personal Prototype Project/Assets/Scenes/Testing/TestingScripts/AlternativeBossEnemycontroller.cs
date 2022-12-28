@@ -241,20 +241,22 @@ public class AlternativeBossEnemycontroller : MonoBehaviour
         }
         void BoulderThrow()
         {
+            float heightCompensation = 3f;
+
             float selfPosX = transform.position.x;
             float selfPosY = transform.position.y;
             float playerPosX = PlayerController.playerTransform.position.x;
             float playerPosY = PlayerController.playerTransform.position.y;
 
-            Vector2 Point_1 = new Vector2(selfPosX, selfPosY);
+            Vector2 Point_1 = new Vector2(selfPosX, selfPosY + heightCompensation); // Compensating added height added in Instantiate method below.
             Vector2 Point_2 = new Vector2(playerPosX, playerPosY);
             float rotation = Mathf.Atan2(Point_2.y - Point_1.y, Point_2.x - Point_1.x) * Mathf.Rad2Deg;
 
             //Miksi vitussa t‰ss‰ pit‰‰ rotationiin laittaa -90, ett‰ toi kaava pit‰‰ paikkansa, ku PlayerMiekassa sit‰ ei tarvi laittaa. wtf? :D
-            Vector3 projectileStartRotation = new Vector3(0f, 0f, rotation - 90);
+            Vector3 projectileStartRotation = new Vector3(transform.position.x, transform.position.y, rotation - 90);
             Quaternion quaternion = Quaternion.Euler(projectileStartRotation);
 
-            Instantiate(boulderPrefab, new Vector2 (transform.position.x, transform.position.y + 3), quaternion); // We want boulder to launch from top of the sprite. Since sprite is throwing boulder "over" itself.
+            Instantiate(boulderPrefab, new Vector2 (transform.position.x, transform.position.y + heightCompensation), quaternion); // We want boulder to launch from top of the sprite, so we are adding little bit of height, where the boulder spawns.. Since we wan it to look like boss is throwing boulder "above" itself.
         }
     }
 
