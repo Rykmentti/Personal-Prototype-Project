@@ -364,6 +364,10 @@ public class PlayerController : MonoBehaviour
         animator.SetBool("IsDead", true);
     }
 
+    public static void PlayerReceiveDamage(float damage)
+    {
+        playerHealth -= damage;
+    }
     void PlayerControls()
     {
         if (Input.GetKeyDown(KeyCode.Space))
