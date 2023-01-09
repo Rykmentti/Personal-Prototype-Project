@@ -81,7 +81,7 @@ public class PlayerController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        playerHealth = 100;
+        playerHealth = 10000; //Regular Value = 100, Testing stuff, so higher value.
         playerTransform = transform;
         animator = GetComponent<Animator>();
         audioSource = GetComponent<AudioSource>();

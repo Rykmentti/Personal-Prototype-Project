@@ -100,8 +100,8 @@ CapsuleCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: -0.03, y: 0.295}
-  m_Size: {x: 0.51, y: 0.59}
+  m_Offset: {x: 0, y: 0}
+  m_Size: {x: 0.42, y: 0.59}
   m_Direction: 0
 --- !u!50 &7800486867696469595
 Rigidbody2D:
@@ -136,7 +136,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a47d7dd4c3e36bc4eadaebf1235a7618, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  currentState: 0
   boulderPrefab: {fileID: 1299557699118404768, guid: 0cb2e0e17ae0d064bbbe9c8e7c1c8abe, type: 3}
+  smashPrefab: {fileID: 20438953680055817, guid: 83a9cd3b6d5b78043ba7c3e1cb3b8350, type: 3}
 --- !u!114 &7800486867696469598
 MonoBehaviour:
   m_ObjectHideFlags: 0
